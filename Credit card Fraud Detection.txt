@@ -1,0 +1,101 @@
+# Import necessary libraries
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
+# Step 2: Data Preparation
+# Assume you have a dataset named 'transactions.csv' with columns 'amount', 'merchant', 'category', 'is_fraud'
+data = pd.read_csv('creditcard.csv')
+X = data.drop('Class', axis=1)
+y = data['Class']  # Target variable
+
+# Step 3: Split data into train and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 4: Model Training
+model = LogisticRegression()
+model.fit(X_test, y_test)
+
+# Step 5: Model Evaluation
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+precision = precision_score(y_test, y_pred)
+recall = recall_score(y_test, y_pred)
+f1 = f1_score(y_test, y_pred)
+roc_auc = roc_auc_score(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Precision:", precision)
+print("Recall:", recall)
+print("F1 Score:", f1)
+print("ROC AUC Score:", roc_auc)
+
+
+fraud_counts = data['Class'].value_counts()
+
+# Plotting the bar graph
+plt.bar(fraud_counts.index, fraud_counts.values, color=['blue', 'red'])
+plt.title('Credit Card Transactions')
+plt.xlabel('Class')
+plt.ylabel('Number of Transactions')
+plt.xticks([0, 1], ['Non-Fraudulent', 'Fraudulent'])
+plt.show()
+
+import unittest
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+class TestCreditCardFraudDetection(unittest.TestCase):
+
+    def setUp(self):
+        # Load the dataset
+        self.data = pd.read_csv("credit_card_data.csv")
+
+    def test_data_loading(self):
+        # Check if dataset is loaded successfully
+        self.assertIsNotNone(self.data)
+        self.assertTrue(len(self.data) > 0)
+
+    def test_data_splitting(self):
+        # Check if data splitting is done correctly
+        X = self.data.drop('Class', axis=1)
+        y = self.data['Class']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        self.assertEqual(len(X_train) + len(X_test), len(X))
+        self.assertEqual(len(y_train) + len(y_test), len(y))
+
+    def test_feature_scaling(self):
+        # Check if feature scaling is applied correctly
+        X = self.data.drop('Class', axis=1)
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        self.assertIsNotNone(X_scaled)
+
+    def test_model_training(self):
+        # Check if the model is trained successfully
+        X = self.data.drop('Class', axis=1)
+        y = self.data['Class']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        model = LogisticRegression()
+        model.fit(X_train, y_train)
+        self.assertTrue(hasattr(model, 'coef_'))
+
+    def test_model_evaluation(self):
+        # Check if the model evaluation metrics are calculated correctly
+        X = self.data.drop('Class', axis=1)
+        y = self.data['Class']
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+        model = LogisticRegression()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+        accuracy = accuracy_score(y_test, y_pred)
+        self.assertTrue(accuracy >= 0 and accuracy <= 1)
+
+if _name_ == '_main_':
+    unittest.main()
